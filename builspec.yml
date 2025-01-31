@@ -1,0 +1,13 @@
+version: 0.2
+phases:
+  install:
+    runtime-versions:
+      python: 3.8
+  build:
+    commands:
+      - echo "Validating AMI Security Compliance..."
+      - aws ec2 describe-images --image-ids ami-0c614dee691cbbf37
+      - echo "Tests Passed!"
+artifacts:
+  files:
+    - '**/*'

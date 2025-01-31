@@ -3,7 +3,7 @@ Resources:
     Type: "AWS::CodePipeline::Pipeline"
     Properties:
       Name: "Golden-AMI-Pipeline"
-      RoleArn: "arn:aws:iam::123456789012:role/CodePipelineRole"
+      RoleArn: "arn:aws:iam::216989130794:role/Code-pipeline-role"
       ArtifactStore:
         Type: "S3"
         Location: "codepipeline-artifacts-bucket"

@@ -1,0 +1,45 @@
+description: "Automation document for creating a Golden AMI"
+schemaVersion: "0.3"
+assumeRole: "{{AutomationAssumeRole}}"
+parameters:
+  BaseAmiId:
+    type: "String"
+    description: "ID of the base AMI to be used"
+  InstanceType:
+    type: "String"
+    default: "t2.micro"
+  SubnetId:
+    type: "String"
+  SecurityGroupId:
+    type: "String"
+mainSteps:
+  - name: launchInstance
+    action: "aws:runInstances"
+    inputs:
+      ImageId: "{{BaseAmiId}}"
+      InstanceType: "{{InstanceType}}"
+      SubnetId: "{{SubnetId}}"
+      SecurityGroupIds:
+        - "{{SecurityGroupId}}"
+      MinInstanceCount: 1
+      MaxInstanceCount: 1
+  - name: applyUpdates
+    action: "aws:runCommand"
+    inputs:
+      DocumentName: "AWS-RunShellScript"
+      InstanceIds:
+        - "{{launchInstance.InstanceIds[0]}}"
+      Parameters:
+        commands:
+          - "sudo yum update -y"
+          - "sudo yum install -y security-tools"
+  - name: createAmi
+    action: "aws:createImage"
+    inputs:
+      InstanceId: "{{launchInstance.InstanceIds[0]}}"
+      ImageName: "Golden-AMI-{{global:DATE_TIME}}"
+  - name: terminateInstance
+    action: "aws:terminateInstances"
+    inputs:
+      InstanceIds:
+        - "{{launchInstance.InstanceIds[0]}}"

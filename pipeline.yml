@@ -6,7 +6,7 @@ Resources:
       RoleArn: "arn:aws:iam::216989130794:role/Code-pipeline-role"
       ArtifactStore:
         Type: "S3"
-        Location: "codepipeline-artifacts-bucket"
+        Location: "demo-cicd-bucket-02"
       Stages:
         - Name: "Source"
           Actions:
@@ -20,7 +20,7 @@ Resources:
                 Owner: "ManojKumar23-cloud"
                 Repo: "golden-ami-repo"
                 Branch: "main"
-                OAuthToken: "GITHUB_PERSONAL_ACCESS_TOKEN"
+                OAuthToken: "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"
               OutputArtifacts:
                 - Name: "SourceOutput"
         - Name: "Build"

@@ -1,0 +1,49 @@
+Resources:
+  GoldenAMIPipeline:
+    Type: "AWS::CodePipeline::Pipeline"
+    Properties:
+      Name: "Golden-AMI-Pipeline"
+      RoleArn: "arn:aws:iam::123456789012:role/CodePipelineRole"
+      ArtifactStore:
+        Type: "S3"
+        Location: "codepipeline-artifacts-bucket"
+      Stages:
+        - Name: "Source"
+          Actions:
+            - Name: "GitHubSource"
+              ActionTypeId:
+                Category: "Source"
+                Owner: "ThirdParty"
+                Provider: "GitHub"
+                Version: "1"
+              Configuration:
+                Owner: "your-github-username"
+                Repo: "golden-ami-repo"
+                Branch: "main"
+                OAuthToken: "GITHUB_PERSONAL_ACCESS_TOKEN"
+              OutputArtifacts:
+                - Name: "SourceOutput"
+        - Name: "Build"
+          Actions:
+            - Name: "BuildAMI"
+              ActionTypeId:
+                Category: "Build"
+                Owner: "AWS"
+                Provider: "CodeBuild"
+                Version: "1"
+              Configuration:
+                ProjectName: "GoldenAMI-Build"
+              InputArtifacts:
+                - Name: "SourceOutput"
+              OutputArtifacts:
+                - Name: "BuildOutput"
+        - Name: "Deploy"
+          Actions:
+            - Name: "TriggerLambda"
+              ActionTypeId:
+                Category: "Invoke"
+                Owner: "AWS"
+                Provider: "Lambda"
+                Version: "1"
+              Configuration:
+                FunctionName: "TriggerGoldenAMI"

@@ -1,13 +1,38 @@
 version: 0.2
+
 phases:
   install:
     runtime-versions:
       python: 3.8
-  build:
+    commands:
+      - pip install awscli
+
+  pre_build:
     commands:
       - echo "Validating AMI Security Compliance..."
-      - aws ec2 describe-images --image-ids ami-0c614dee691cbbf37
+      - aws ec2 describe-images --image-ids ami-03da723fe1016e48f
       - echo "Tests Passed!"
-artifacts:
-  files:
-    - '**/*'
+      - echo "Retrieving current launch template version"
+      - LAUNCH_TEMPLATE_ID=$(aws ec2 describe-launch-templates --launch-template-names "GoldenAMI-Template" --query "LaunchTemplates[0].LaunchTemplateId" --output text)
+      - LATEST_VERSION=$(aws ec2 describe-launch-template-versions --launch-template-id $LAUNCH_TEMPLATE_ID --query "LaunchTemplateVersions[0].VersionNumber" --output text)
+
+  build:
+    commands:
+      - echo "Updating launch template with new AMI ID"
+      - |
+        aws ec2 create-launch-template-version \
+          --launch-template-id $LAUNCH_TEMPLATE_ID \
+          --version-description "Updated AMI ID" \
+          --source-version $LATEST_VERSION \
+          --launch-template-data '{"ImageId":"ami-03da723fe1016e48f"}'
+      
+      - echo "Setting new version as default"
+      - NEW_VERSION=$((LATEST_VERSION + 1))
+      - |
+        aws ec2 modify-launch-template \
+          --launch-template-id $LAUNCH_TEMPLATE_ID \
+          --default-version $NEW_VERSION
+
+  post_build:
+    commands:
+      - echo "Launch template updated successfully"

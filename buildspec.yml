@@ -10,10 +10,10 @@ phases:
   pre_build:
     commands:
       - echo "Validating AMI Security Compliance..."
-      - aws ec2 describe-images --image-ids ami-0c614dee691cbbf37
+      - aws ec2 describe-images --image-ids ami-07bc5b30a4bd8320e
       - echo "Tests Passed!"
       - echo "Retrieving current launch template version"
-      - LAUNCH_TEMPLATE_ID=$(aws ec2 describe-launch-templates --launch-template-names "sample-temnplate" --query "LaunchTemplates[0].LaunchTemplateId" --output text)
+      - LAUNCH_TEMPLATE_ID=$(aws ec2 describe-launch-templates --launch-template-names "demo-Template" --query "LaunchTemplates[0].LaunchTemplateId" --output text)
       - LATEST_VERSION=$(aws ec2 describe-launch-template-versions --launch-template-id $LAUNCH_TEMPLATE_ID --query "LaunchTemplateVersions[0].VersionNumber" --output text)
 
   build:
@@ -24,7 +24,7 @@ phases:
           --launch-template-id $LAUNCH_TEMPLATE_ID \
           --version-description "Updated AMI ID" \
           --source-version $LATEST_VERSION \
-          --launch-template-data '{"ImageId":"ami-0c614dee691cbbf37"}'
+          --launch-template-data '{"ImageId":"ami-07bc5b30a4bd8320e"}'
       
       - echo "Setting new version as default"
       - NEW_VERSION=$((LATEST_VERSION + 1))

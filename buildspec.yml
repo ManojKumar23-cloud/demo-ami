@@ -10,7 +10,7 @@ phases:
   pre_build:
     commands:
       - echo "Validating AMI Security Compliance..."
-      - aws ec2 describe-images --image-ids ami-03da723fe1016e48f
+      - aws ec2 describe-images --image-ids ami-0c614dee691cbbf37
       - echo "Tests Passed!"
       - echo "Retrieving current launch template version"
       - LAUNCH_TEMPLATE_ID=$(aws ec2 describe-launch-templates --launch-template-names "GoldenAMI-Template" --query "LaunchTemplates[0].LaunchTemplateId" --output text)
@@ -24,7 +24,7 @@ phases:
           --launch-template-id $LAUNCH_TEMPLATE_ID \
           --version-description "Updated AMI ID" \
           --source-version $LATEST_VERSION \
-          --launch-template-data '{"ImageId":"ami-03da723fe1016e48f"}'
+          --launch-template-data '{"ImageId":"ami-0c614dee691cbbf37"}'
       
       - echo "Setting new version as default"
       - NEW_VERSION=$((LATEST_VERSION + 1))
